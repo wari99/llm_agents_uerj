@@ -18,6 +18,22 @@ class Context:
 class ResponseFormat:
     summary: str
 
+@tool("ler_arquivo_rag")
+def ler_arquivo_rag(nome_do_arquivo: str) -> str:
+    """
+        Ferramenta utilizada para ler o conteúdo dos arquivos.
+
+
+    """
+    if not os.path.exists(RAG_DIR):
+        return "erro: diretório não encontrada."
+    
+    arquivos = os.listdir(RAG_DIR)
+    if not arquivos:
+        return "info: nenhum arquivo encontrado na pasta RAG."
+
+    return "\n".join(arquivos)
+    
 model = ChatGoogleGenerativeAI(
     model="gemini-2.5-flash",
     temperature=0.5,
@@ -26,7 +42,9 @@ model = ChatGoogleGenerativeAI(
 agent = create_agent(
     model=model,
     context_schema=Context,
-    system_prompt="Você é o ARCOS - RJ..."
+    system_prompt="Você é o ARCOS - RJ...",
+    tools = [ler_arquivo_rag]
+
 )
 
 graph = StateGraph(AgentState)
