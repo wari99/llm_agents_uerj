@@ -22,7 +22,7 @@ class Context:
 class ResponseFormat:
     summary: str
 
-@tool("ler_arquivo_rag") 
+@tool("ler_arquivo_rag") #####
 def ler_arquivo_rag(nome_do_arquivo: str) -> str:
     """
         Ferramenta utilizada para ler o conteúdo dos arquivos
@@ -37,8 +37,8 @@ def ler_arquivo_rag(nome_do_arquivo: str) -> str:
 
     return "\n".join(arquivos)
 
-@tool("listar_bases_rj")
-def listar_bases_rj(_: str = "") -> Any:
+@tool("listar_bases")
+def listar_bases(_: str = "") -> Any:
     """
     Retorna a lista de todas as bases disponíveis no Dados Abertos do RJ.
     Consulta o endpoint oficial package_list.
@@ -50,8 +50,8 @@ def listar_bases_rj(_: str = "") -> Any:
     except Exception as e:
         return {"erro": f"Falha ao consultar API: {str(e)}"}
 
-@tool("buscar_info_base")
-def buscar_info_base(base_nome: str) -> Any:
+@tool("buscar_infos_base")
+def buscar_infos_base(base_nome: str) -> Any:
     """
     Busca informações detalhadas de uma base específica do portal Dados Abertos RJ,
     usando o endpoint package_search.
@@ -75,8 +75,8 @@ agent = create_agent(
     system_prompt=prompt,
     tools = [
         ler_arquivo_rag,
-        listar_bases_rj,
-        buscar_info_base
+        listar_bases,
+        buscar_infos_base
     ]
 
 )
@@ -107,7 +107,16 @@ while True:
         config={"thread_id": "1"}
     )
 
-    resposta = resultado["messages"][-1].content
+    #resposta = resultado["messages"][-1].content
+    #resposta = resultado["messages"][-1].content[0]["text"]
+
+    mensagens = resultado["messages"][-1].content
+
+    if isinstance(mensagens, list) and len(mensagens) > 0 and "text" in mensagens[0]:
+        resposta = mensagens[0]["text"]
+    else:
+        resposta = str(mensagens)
+
     print("ARCOS-RJ:", resposta)
 
 
